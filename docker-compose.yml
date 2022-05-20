@@ -1,0 +1,39 @@
+version: "3.9"
+services:
+  web:
+    build:
+      context: .
+      args:
+        - UID=${UID}
+        - GID=${GID}
+    volumes:
+      - vendor:/usr/src/app/node_modules
+      - .:/usr/src/app/
+    ports:
+      - 5100:5100
+      - 3036:3036
+    depends_on:
+      - db
+    env_file:
+      - .env
+
+  db:
+    image: postgres:14.1-alpine
+    volumes:
+      - data:/var/lib/postgresql/data
+    env_file:
+      - .env
+
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - 8080:8080
+volumes:
+  data:
+  vendor:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ${PWD}/node_modules
